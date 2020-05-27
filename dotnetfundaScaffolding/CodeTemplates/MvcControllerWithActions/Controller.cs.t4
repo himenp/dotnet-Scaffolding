@@ -1,0 +1,177 @@
+﻿<#@ template language="C#" HostSpecific="True" #>
+<#@ output extension="cs" #>
+<#@ import namespace="System" #>
+<#@ parameter type="System.String" name="ControllerName" #>
+<#@ parameter type="System.String" name="ControllerRootName" #>
+<#@ parameter type="System.String" name="Namespace" #>
+<#@ parameter type="System.String" name="AreaName" #>
+<# 
+	string routePrefix; 
+	string modelName; 
+	string modelVariable; 
+	
+		if (String.IsNullOrEmpty(AreaName)) 
+		{ 
+			routePrefix = ControllerRootName; 
+			modelName = ControllerRootName; 
+			modelVariable = ControllerRootName.ToLower(); 
+		} 
+		else 
+		{ 
+			routePrefix = AreaName + "/" + ControllerRootName; 
+			modelName = ControllerRootName; 
+			modelVariable = ControllerRootName.ToLower(); 
+		} 
+#>
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using dotnetfundaScaffolding.Models;
+namespace <#= Namespace #>
+{
+	public class <#=ControllerName #> : Controller
+	{
+		private IRepository<<#= modelName #>> repository = null;
+		private bool Success = false;
+
+		// GET: <#= routePrefix #>
+		public <#=ControllerName #>()
+		{
+			this.repository = new Repository<<#= modelName #>>();
+		}
+		public <#=ControllerName #>(IRepository<<#= modelName #>> repository)
+		{
+			this.repository = repository;
+		}
+		public ActionResult Index()
+		{
+			try
+			{
+				ViewBag.PageTitle = "<#= modelName #> | <#= modelName #> List";
+				if (TempData["Message"] != null)
+				{
+					ViewBag.Message = TempData["Message"];
+				}
+				var model = (List<<#= modelName #>>)repository.SelectAll();
+				return View("<#= modelName #>List",model);
+			}
+			catch (Exception ex)
+			{
+				ViewBag.Message = ex.Message;
+				return View();
+			}
+		}
+		// GET: <#= routePrefix #>/New
+		[HttpGet]
+		public ActionResult New()
+		{
+			ViewBag.PageTitle = "<#= modelName #> | New <#= modelName #>";
+			if (TempData["Message"] != null)
+			{
+				ViewBag.Message = TempData["Message"];
+			}
+			return View("<#= modelName #>", new <#= modelName #>Model());
+		}
+		// POST: <#= routePrefix #>/New
+		[HttpPost]
+		public ActionResult New(<#= modelName #>Model <#= modelVariable #>model)
+		{
+			try
+			{
+				if (!ModelState.IsValid)
+				{
+					ViewBag.PageTitle = "<#= modelName #> | New <#= modelName #>";
+					return View("<#= modelName #>", new <#= modelName #>Model());
+				}
+				var <#= modelVariable #> = new <#= modelName #>
+				{
+					//TODO :
+				};
+				repository.Insert(<#= modelVariable #>);
+				Success = repository.Save();
+				if (Success)
+				{
+					TempData["Message"] = "<#= modelName #> Successfully Created.";
+				}
+				return RedirectToAction("Index");
+			}
+			catch
+			{
+				ViewBag.PageTitle = "<#= modelName #> | New <#= modelName #>";
+				return View("<#= modelName #>", new <#= modelName #>Model());
+			}
+		}
+		// GET: <#= routePrefix #>/Edit/
+		public ActionResult Edit(int id)
+		{
+			try
+			{
+				ViewBag.PageTitle = "<#= modelName #> | Edit <#= modelName #>";
+				if (TempData["Message"] != null)
+				{
+					ViewBag.Message = TempData["Message"];
+				}
+				<#= modelName #> <#= modelVariable #> = repository.SelectByID(id);
+				var model = new <#= modelName #>Model
+				{
+					//TODO :
+				};
+				return View("<#= modelName #>", model);
+			}
+			catch (Exception ex)
+			{
+				TempData["Message"] = ex.Message;
+				return RedirectToAction("Index");
+			}
+		}
+		// POST: <#= routePrefix #>/Edit/
+		[HttpPost]
+		public ActionResult Edit(int id, <#= modelName #>Model <#= modelVariable #>model)
+		{
+			try
+			{
+				if (!ModelState.IsValid)
+				{
+					return RedirectToAction("Edit", new { id = id });
+				}
+				var <#= modelVariable #> = new <#= modelName #>
+				{
+					//TODO :
+				};
+				repository.Update(<#= modelVariable #>);
+				Success = repository.Save();
+				if (Success)
+				{
+					TempData["Message"] = "<#= modelName #> Successfully Updated.";
+				}
+				return RedirectToAction("Index");
+			}
+			catch (Exception ex)
+			{
+				TempData["Message"] = ex.Message;
+				return RedirectToAction("Edit", new { id = id });
+			}
+		}
+		// GET: <#= routePrefix #>/Delete/
+		public ActionResult Delete(int id)
+		{
+			try
+			{
+				repository.Delete(id);
+				Success = repository.Save();
+				if (Success)
+				{
+					TempData["Message"] = "<#= modelName #> Successfully Deleted.";
+				}
+				return RedirectToAction("Index");
+			}
+			catch (Exception ex)
+			{
+				TempData["Message"] = ex.Message;
+				return RedirectToAction("Index");
+			}
+		}
+	}
+}

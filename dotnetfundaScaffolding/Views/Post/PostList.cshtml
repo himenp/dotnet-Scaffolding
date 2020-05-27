@@ -1,0 +1,65 @@
+﻿@model IEnumerable<dotnetfundaScaffolding.Models.Post>
+
+@{
+    ViewBag.Title = "Fundamentals of .NET | PostList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Post | Post List</h2>
+
+<div class="row">
+    <div class="col-md-8">
+<p>
+    @Html.ActionLink("Create New", "New")
+</p>
+<p style="text-align:center;color:red">@ViewBag.Message</p>
+<table class="table">
+    <tr style="background-color:#333;color:#fff">
+        <th>
+            @Html.DisplayNameFor(model => model.Author)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Title)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Content)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.CreatedDate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.LastmodifiedDate)
+        </th>
+        <th>Edit</th>
+		<th>Delete</th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Author)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Title)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Content)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.CreatedDate)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.LastmodifiedDate)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.PostId })
+        </td>
+        <td>
+            @Html.ActionLink("Delete", "Delete", new { id = item.PostId })
+        </td>
+    </tr>
+}
+
+</table>
+</div>
+    </div>
